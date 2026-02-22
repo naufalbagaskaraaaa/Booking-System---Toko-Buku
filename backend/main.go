@@ -49,7 +49,7 @@ func withCORS(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 func main() {
-	connStr := "user=webadmin password=MGDcoc25159 dbname=bookingSystem host=nnode73839-bukusukamaju.user.cloudjkt01.com port=5432 sslmode=disable"
+	connStr := "user=webadmin password=MGDcoc25159 dbname=bookingSystem host=node73839-bukusukamaju.user.cloudjkt01.com port=5432 sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal("Gagal buka koneksi:", err)
