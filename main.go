@@ -279,5 +279,7 @@ func main() {
 	}))
 
 	fmt.Println("Server jalan di http://localhost:8080")
+	fs := http.FileServer(http.Dir("./frontend/dist"))
+	http.Handle("/", fs)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
