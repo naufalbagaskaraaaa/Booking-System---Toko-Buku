@@ -12,14 +12,14 @@ function App() {
   const [activePage, setActivePage] = useState("books")
 
   const fetchBooks = () => {
-    fetch('http://localhost:8080/api/books')
+    fetch('https://bukusukamaju.user.cloudjkt01.com/api/books')
       .then(async response => response.json())
       .then(data => setBooks(data === null ? [] : data))
       .catch(error => console.error("Error fetch:", error))
   }
 
   const fetchHistories = () => {
-    fetch('http://localhost:8080/api/history')
+    fetch('https://bukusukamaju.user.cloudjkt01.com/api/history')
       .then(async response => response.json())
       .then(data => setHistories(data === null ? [] : data))
       .catch(error => console.error("Error fetch history:", error))
@@ -46,7 +46,7 @@ function App() {
         stock: parseInt(newStock)
       }
 
-      fetch('http://localhost:8080/api/book/update', {
+      fetch('https://bukusukamaju.user.cloudjkt01.com/api/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedData)
@@ -68,7 +68,7 @@ function App() {
         stock: parseInt(newStock)
       }
 
-      fetch('http://localhost:8080/api/books', {
+      fetch('https://bukusukamaju.user.cloudjkt01.com/api/books', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newBookData)
@@ -106,7 +106,7 @@ function App() {
   const handleDelete = (ID_Buku) => {
     if (!window.confirm("Yakin mau hapus buku ini?")) return
 
-    fetch('http://localhost:8080/api/book/delete', {
+    fetch('https://bukusukamaju.user.cloudjkt01.com/api/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_buku: ID_Buku })
@@ -126,7 +126,7 @@ function App() {
       return
     }
 
-    fetch('http://localhost:8080/api/book', {
+    fetch('https://bukusukamaju.user.cloudjkt01.com/api/books', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_buku: ID_Buku, borrower_name: borrower })
@@ -149,7 +149,7 @@ function App() {
   }
 
   const handleReturn = (ID_Buku, Judul) => {
-    fetch('http://localhost:8080/api/return', {
+    fetch('https://bukusukamaju.user.cloudjkt01.com/api/return', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_buku: ID_Buku })
