@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 
+const BASE_URL = 'https://bukusukamaju.user.cloudjkt01.com'
+
 function App() {
   const [books, setBooks] = useState([])
   const [histories, setHistories] = useState([])
@@ -12,14 +14,14 @@ function App() {
   const [activePage, setActivePage] = useState("books")
 
   const fetchBooks = () => {
-    fetch('https://bukusukamaju.user.cloudjkt01.com/api/books')
+    fetch(`${BASE_URL}/api/books`)
       .then(async response => response.json())
       .then(data => setBooks(data === null ? [] : data))
       .catch(error => console.error("Error fetch:", error))
   }
 
   const fetchHistories = () => {
-    fetch('https://bukusukamaju.user.cloudjkt01.com/api/history')
+    fetch(`${BASE_URL}/api/history`)
       .then(async response => response.json())
       .then(data => setHistories(data === null ? [] : data))
       .catch(error => console.error("Error fetch history:", error))
@@ -46,7 +48,7 @@ function App() {
         stock: parseInt(newStock)
       }
 
-      fetch('https://bukusukamaju.user.cloudjkt01.com/api/update', {
+      fetch(`${BASE_URL}/api/book/update`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedData)
@@ -68,7 +70,7 @@ function App() {
         stock: parseInt(newStock)
       }
 
-      fetch('https://bukusukamaju.user.cloudjkt01.com/api/books', {
+      fetch(`${BASE_URL}/api/books`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newBookData)
@@ -106,7 +108,7 @@ function App() {
   const handleDelete = (ID_Buku) => {
     if (!window.confirm("Yakin mau hapus buku ini?")) return
 
-    fetch('https://bukusukamaju.user.cloudjkt01.com/api/delete', {
+    fetch(`${BASE_URL}/api/book/delete`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_buku: ID_Buku })
@@ -126,7 +128,7 @@ function App() {
       return
     }
 
-    fetch('https://bukusukamaju.user.cloudjkt01.com/api/books', {
+    fetch(`${BASE_URL}/api/book`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_buku: ID_Buku, borrower_name: borrower })
@@ -149,7 +151,7 @@ function App() {
   }
 
   const handleReturn = (ID_Buku, Judul) => {
-    fetch('https://bukusukamaju.user.cloudjkt01.com/api/return', {
+    fetch(`${BASE_URL}/api/return`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_buku: ID_Buku })
@@ -171,6 +173,10 @@ function App() {
     })
   }
 
+  const isBorrowed = (id_buku) => {
+    return histories.some(h => h.id_buku === id_buku && h.status === 'Dipinjam')
+  }
+
   const filteredBooks = books.filter(book => 
     book.judul.toLowerCase().includes(searchTerm.toLowerCase()) || 
     book.author.toLowerCase().includes(searchTerm.toLowerCase())
@@ -179,35 +185,32 @@ function App() {
   return (
     <div style={{ fontFamily: "'Inter', sans-serif", minHeight: "100vh", backgroundColor: "#1f2937", color: "#f9fafb" }}>
 
-      {/* ✅ NAVBAR — diletakkan di dalam return, di paling atas */}
       <nav style={{ backgroundColor: "#111827", padding: "0 40px", display: "flex", alignItems: "center", gap: "8px", borderBottom: "1px solid #374151", position: "sticky", top: 0, zIndex: 100 }}>
-        <span style={{ fontSize: "1.3rem", marginRight: "16px", padding: "16px 0" }}>📚</span>
         <span style={{ fontWeight: "700", fontSize: "1rem", marginRight: "32px", color: "#f9fafb" }}>Reservasi Buku</span>
 
         <button
           onClick={() => setActivePage("books")}
           style={{ padding: "18px 20px", background: "none", border: "none", cursor: "pointer", fontSize: "0.9rem", fontWeight: "600", color: activePage === "books" ? "#10b981" : "#9ca3af", borderBottom: activePage === "books" ? "2px solid #10b981" : "2px solid transparent" }}
         >
-          📖 Koleksi Buku
+          Koleksi Buku
         </button>
 
         <button
           onClick={() => setActivePage("history")}
           style={{ padding: "18px 20px", background: "none", border: "none", cursor: "pointer", fontSize: "0.9rem", fontWeight: "600", color: activePage === "history" ? "#10b981" : "#9ca3af", borderBottom: activePage === "history" ? "2px solid #10b981" : "2px solid transparent" }}
         >
-          🕒 Riwayat ({histories.length})
+          Riwayat ({histories.length})
         </button>
       </nav>
 
       <div style={{ padding: "40px 20px" }}>
         <div style={{ maxWidth: "750px", margin: "auto" }}>
 
-          {/* ✅ TAB KOLEKSI BUKU — semua konten buku dibungkus kondisi ini */}
           {activePage === "books" && (
             <>
               <div style={{ textAlign: "center", marginBottom: "30px" }}>
-                <h1 style={{ fontSize: "2.5rem", margin: "0 0 10px 0", fontWeight: "800", letterSpacing: "-1px" }}>📚 Reservasi Buku</h1>
-                <p style={{ color: "#9ca3af", margin: 0 }}>Sistem peminjaman perpustakaan mini</p>
+                <h1 style={{ fontSize: "2.5rem", margin: "0 0 10px 0", fontWeight: "800", letterSpacing: "-1px" }}>Reservasi Buku</h1>
+                <p style={{ color: "#9ca3af", margin: 0 }}>BookingSystem - Toko Buku Suka Maju</p>
               </div>
 
               <div style={{ backgroundColor: "#ffffff", padding: "25px", borderRadius: "12px", marginBottom: "30px", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", color: "#111827" }}>
@@ -259,10 +262,18 @@ function App() {
                           <button onClick={() => handleDelete(book.id_buku)} style={{ padding: "6px 12px", backgroundColor: "#ef4444", color: "#fff", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "600", fontSize: "0.85rem" }}>🗑️ Hapus</button>
                         </div>
                         <div style={{ display: "flex", gap: "10px" }}>
-                          <button onClick={() => handleReturn(book.id_buku, book.judul)} style={{ padding: "10px 15px", backgroundColor: "#f59e0b", color: "#ffffff", border: "none", borderRadius: "8px", cursor: "pointer", fontWeight: "600", fontSize: "0.95rem" }}>
+                          <button
+                            onClick={() => handleReturn(book.id_buku, book.judul)}
+                            disabled={!isBorrowed(book.id_buku)}
+                            style={{ padding: "10px 15px", backgroundColor: isBorrowed(book.id_buku) ? "#f59e0b" : "#e5e7eb", color: isBorrowed(book.id_buku) ? "#ffffff" : "#9ca3af", border: "none", borderRadius: "8px", cursor: isBorrowed(book.id_buku) ? "pointer" : "not-allowed", fontWeight: "600", fontSize: "0.95rem" }}
+                          >
                             Kembalikan
                           </button>
-                          <button onClick={() => handleBooking(book.id_buku, book.judul)} disabled={book.stock === 0} style={{ padding: "10px 20px", backgroundColor: book.stock > 0 ? "#3b82f6" : "#e5e7eb", color: book.stock > 0 ? "#ffffff" : "#9ca3af", border: "none", borderRadius: "8px", cursor: book.stock > 0 ? "pointer" : "not-allowed", fontWeight: "600", fontSize: "0.95rem" }}>
+                          <button
+                            onClick={() => handleBooking(book.id_buku, book.judul)}
+                            disabled={book.stock === 0}
+                            style={{ padding: "10px 20px", backgroundColor: book.stock > 0 ? "#3b82f6" : "#e5e7eb", color: book.stock > 0 ? "#ffffff" : "#9ca3af", border: "none", borderRadius: "8px", cursor: book.stock > 0 ? "pointer" : "not-allowed", fontWeight: "600", fontSize: "0.95rem" }}
+                          >
                             {book.stock > 0 ? "Pinjam" : "Kosong"}
                           </button>
                         </div>
@@ -274,7 +285,6 @@ function App() {
             </>
           )}
 
-          {/* ✅ TAB RIWAYAT — konten history dibungkus kondisi ini */}
           {activePage === "history" && (
             <div style={{ backgroundColor: "#ffffff", padding: "20px", borderRadius: "12px", color: "#111827" }}>
               <h3 style={{ margin: "0 0 15px 0", borderBottom: "1px solid #e5e7eb", paddingBottom: "10px" }}>🕒 Riwayat Transaksi</h3>
